@@ -5,9 +5,7 @@ apply plugin: 'groovy'
 apply from: 'gradle/infra.gradle'
 
 repositories {
-  // mavenRepo name: 'Spring Release', url: 'http://repo.springsource.org/release'
   mavenRepo name: 'Gemstone', url: 'http://dist.gemstone.com/maven/release'
-  // mavenRepo name: 'Java.net', url: 'http://download.java.net/maven/2'
   mavenCentral()
 }
 
@@ -20,3 +18,5 @@ dependencies {
 test {
     testLogging.showStandardStreams = true
 }
+
+task cleanCheck(dependsOn: ['check','clean'])

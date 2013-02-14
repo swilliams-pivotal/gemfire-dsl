@@ -1,4 +1,4 @@
-package org.tpi.pso.gemfire.dsl2
+package com.pivotal.pso.gemfire.dsl
 
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked

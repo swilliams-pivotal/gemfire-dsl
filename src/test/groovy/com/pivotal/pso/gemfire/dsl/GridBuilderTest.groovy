@@ -1,4 +1,4 @@
-package org.tpi.pso.gemfire.dsl2;
+package com.pivotal.pso.gemfire.dsl;
 
 import static com.gemstone.gemfire.cache.RegionShortcut.PARTITION
 import static com.gemstone.gemfire.cache.RegionShortcut.REPLICATE
@@ -67,9 +67,7 @@ class GridBuilderTest {
                 'jmx-manager': 'true',
                 'jmx-manager-start': 'false',
                 'bind-address': '127.0.0.1',
-                'license-working-dir': System.getProperty('user.dir') + '/license',
-//                'license-application-cache': 'dynamic',
-//                'license-data-management': 'dynamic'
+                'license-working-dir': System.getProperty('user.dir') + '/license'
             )
             pdx {
                 diskStore 'foo'
@@ -102,7 +100,8 @@ class GridBuilderTest {
                 region 'region2', type: REPLICATE, {
                     writer {
                         beforeCreate { e->
-                            // drop
+                            println "2.beforeCreate: ${e}"  // DOES fire.
+                            // drop()
                         }
                     }
                     listener {
@@ -128,7 +127,7 @@ class GridBuilderTest {
                     // listener listener4
                 }
                 region 'region5', type: REPLICATE, {
-                    listener listener5
+                    // listener listener5
                 }
                 region 'all', type: REPLICATE, {
                     writer {
