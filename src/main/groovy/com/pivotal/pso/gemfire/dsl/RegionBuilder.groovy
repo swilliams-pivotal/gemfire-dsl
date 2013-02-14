@@ -47,35 +47,27 @@ class RegionBuilder {
     }
 
     def loader(@DelegatesTo(strategy=Closure.OWNER_FIRST, value=GenericListenerBuilder) Closure closure) {
-        // println "RegionBuilder.loaderFromClosure(closure: ${closure.dump()})"
 
         def builder = new GenericListenerBuilder()
         def hydrated = closure.rehydrate(builder, this, this)
         hydrated.resolveStrategy = Closure.DELEGATE_FIRST
         def loader = hydrated()
 
-        // println "RegionBuilder.loader: " + loader
-
         regionFactory.setCacheLoader(loader as CacheLoader)
     }
 
     def loader(Map loader) {
-        // println "RegionBuilder.loaderFromMap(map: ${loader.dump()})"
         Map<String, Closure> all = [:].withDefault { -> { -> } }
         all.putAll(loader)
         regionFactory.setCacheLoader(all as CacheLoader)
     }
 
     def writer(@DelegatesTo(strategy=Closure.OWNER_FIRST, value=GenericListenerBuilder) Closure closure) {
-        // println "RegionBuilder.writerFromClosure(closure: ${closure.dump()})"
 
         def builder = new GenericListenerBuilder()
         def hydrated = closure.rehydrate(builder, this, this)
         hydrated.resolveStrategy = Closure.DELEGATE_FIRST
         def writer = hydrated()
-
-        // println "RegionBuilder.writer: " + writer
-
         regionFactory.setCacheWriter(writer as CacheWriterAdapter)
     }
 
@@ -87,24 +79,17 @@ class RegionBuilder {
     }
 
     def listener(@DelegatesTo(strategy=Closure.OWNER_FIRST, value=GenericListenerBuilder) Closure closure) {
-        // println "RegionBuilder.listenerFromClosure(closure: ${closure.dump()})"
 
         def builder = new GenericListenerBuilder()
         def hydrated = closure.rehydrate(builder, this, this)
         hydrated.resolveStrategy = Closure.DELEGATE_FIRST
         def listener = hydrated()
 
-        // println "RegionBuilder.listener: " + listener
-
         regionFactory.addCacheListener(listener as CacheListenerAdapter)
     }
 
     def listener(Map listener) {
-        // println "RegionBuilder.listenerFromMap(map: ${listener.dump()})"
-
         Map<String, Closure> all = [:]
-        all.putAll CACHE_LISTENER_MAP
-        // all.putAll listener
 
         listener.collectEntries(all) { String name, Closure closure ->
 
@@ -116,7 +101,7 @@ class RegionBuilder {
             [name, hydrated]
         }
 
-        regionFactory.addCacheListener(all as CacheListenerAdapter)
+        regionFactory.addCacheListener(listener as CacheListenerAdapter)
     }
 
     def methodMissing(String name, args) {

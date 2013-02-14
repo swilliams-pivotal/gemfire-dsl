@@ -8,6 +8,8 @@ import java.util.concurrent.TimeUnit
 
 import org.junit.Test
 
+import com.gemstone.gemfire.cache.EntryEvent
+
 
 class GridBuilderTest {
 
@@ -29,26 +31,26 @@ class GridBuilderTest {
             }
         ]
 
-        def listener4 = {
-            afterCreate: {
-                println "4.afterCreate: ${it}" // Does NOT fire, why?
-                // send(e)
-            }
-            afterDestroy: {
-                println "4.afterDestroy: ${it}"
-            }
-            afterRegionCreate: {
-                println "4.afterRegionCreate: ${it}" // DOES fire.
-            }
-            afterRegionDestroy: {
-                println "4.afterRegionDestroy: ${it}"
-            }
-        }
+//        def listener4 = {
+//            afterCreate: {
+//                println "4.afterCreate: ${it}" // Does NOT fire, why?
+//                // send(e)
+//            }
+//            afterDestroy: {
+//                println "4.afterDestroy: ${it}"
+//            }
+//            afterRegionCreate: {
+//                println "4.afterRegionCreate: ${it}" // DOES fire.
+//            }
+//            afterRegionDestroy: {
+//                println "4.afterRegionDestroy: ${it}"
+//            }
+//        }
 
         def listener5 = {
             afterCreate { e->
-                println "5.afterCreate: ${e}" // Does NOT fire, why?
-                // send(e)
+                // println "5.afterCreate: ${e}" // Does NOT fire, why?
+                send(e)
             }
             afterDestroy { e->
                 println "5.afterDestroy: ${e}"
@@ -56,7 +58,7 @@ class GridBuilderTest {
             afterRegionCreate { e->
                 println "5.afterRegionCreate: ${e}" // DOES fire.
             }
-            afterRegionDestroy: { e->
+            afterRegionDestroy { e->
                 println "5.afterRegionDestroy: ${e}"
             }
         }
@@ -82,7 +84,7 @@ class GridBuilderTest {
                 }
                 region 'region1', type: REPLICATE, {
                     listener (
-                        afterCreate: { e->
+                        afterCreate: { EntryEvent e->
                             // println "1.afterCreate: ${e}"  // DOES fire.
                             send(e)
                         },
@@ -127,7 +129,7 @@ class GridBuilderTest {
                     // listener listener4
                 }
                 region 'region5', type: REPLICATE, {
-                    // listener listener5
+                    listener listener5
                 }
                 region 'all', type: REPLICATE, {
                     writer {
