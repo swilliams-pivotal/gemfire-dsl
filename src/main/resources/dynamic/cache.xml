@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE cache PUBLIC
+    "-//GemStone Systems, Inc.//GemFire Declarative Caching 7.0//EN" 
+"http://www.gemstone.com/dtd/cache7_0.dtd">
+<cache>
+    <dynamic-region-factory>
+        <disk-dir>regions/disk-dir1</disk-dir>
+        <cache-loader>
+            <class-name>org.tpi.pso.gemfire.dsl.support.DefaultClassLoader</class-name>
+        </cache-loader>
+        <cache-writer>
+            <class-name>org.tpi.pso.gemfire.dsl.support.DefaultCacheWriter</class-name>
+        </cache-writer>
+    </dynamic-region-factory>
+    <cache-server port="40001" bind-address="127.0.0.1">
+    </cache-server>
+    <region name="classloader">
+        <region-attributes data-policy="replicate" scope="distributed-ack">
+        </region-attributes>
+    </region>
+    <region name="configuration">
+        <region-attributes data-policy="replicate" scope="distributed-ack">
+        </region-attributes>
+    </region>
+    <region name="metadata">
+        <region-attributes data-policy="replicate" scope="distributed-ack">
+        </region-attributes>
+    </region>
+    <initializer>
+        <class-name>org.tpi.pso.gemfire.dsl.dynamic.Bootstrap</class-name>
+        <parameter name="dsl">
+            <string>dsl-setup.groovy</string>
+        </parameter>
+    </initializer>
+</cache>
