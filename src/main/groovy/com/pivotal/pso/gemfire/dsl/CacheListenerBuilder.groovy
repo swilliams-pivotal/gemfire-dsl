@@ -1,7 +1,9 @@
 package com.pivotal.pso.gemfire.dsl
 
+import groovy.transform.CompileStatic
 
-//@CompileStatic
+
+@CompileStatic
 class CacheListenerBuilder {
 
     private Map<String, Closure> listener = [:]

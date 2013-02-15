@@ -6,6 +6,7 @@ import groovy.transform.CompileStatic
 import com.gemstone.gemfire.cache.Cache
 import com.gemstone.gemfire.cache.CacheFactory
 
+
 @CompileStatic
 class GemFireBuilder {
 

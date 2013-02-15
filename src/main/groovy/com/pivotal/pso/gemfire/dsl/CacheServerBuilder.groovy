@@ -1,8 +1,12 @@
 package com.pivotal.pso.gemfire.dsl
 
+import groovy.transform.CompileStatic
+
 import com.gemstone.gemfire.cache.server.CacheServer
 import com.gemstone.gemfire.cache.server.ServerLoadProbe
 
+
+@CompileStatic
 class CacheServerBuilder {
 
     private CacheServer server

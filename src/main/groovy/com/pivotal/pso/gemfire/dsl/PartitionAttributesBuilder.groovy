@@ -1,10 +1,13 @@
 package com.pivotal.pso.gemfire.dsl
 
+import groovy.transform.CompileStatic
+
 import com.gemstone.gemfire.cache.PartitionAttributesFactory
 import com.gemstone.gemfire.cache.PartitionResolver
 import com.gemstone.gemfire.cache.partition.PartitionListener
 
 
+@CompileStatic
 class PartitionAttributesBuilder {
 
     private PartitionAttributesFactory factory
@@ -49,7 +52,7 @@ class PartitionAttributesBuilder {
             hydrated.resolveStrategy = Closure.DELEGATE_FIRST
             [name, hydrated]
         }
-        resolver(resolver.getName(), resolver.getRoutingObject(), resolver.close())
+        // resolver(resolver.getName(), resolver.getRoutingObject(), resolver.close())
         this
     }
 
