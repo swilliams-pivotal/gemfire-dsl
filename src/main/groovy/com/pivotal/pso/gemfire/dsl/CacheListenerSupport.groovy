@@ -2,6 +2,7 @@ package com.pivotal.pso.gemfire.dsl
 
 import groovy.transform.CompileStatic
 
+import com.gemstone.gemfire.cache.CacheFactory
 import com.gemstone.gemfire.cache.Region
 import com.gemstone.gemfire.cache.execute.FunctionService
 
@@ -11,7 +12,13 @@ class CacheListenerSupport {
 
     def send(Object args) {
         println "CacheListenerSupport.send(${args})"
+        this
     }
+
+//    def to(String regionName) {
+//        println "CacheListenerSupport.to(${regionName})"
+//        CacheFactory.getAnyInstance().getRegion(regionName)
+//    }
 
     def func(String func, Object... args) {
         println "CacheListenerSupport.func(${func})"
@@ -20,6 +27,15 @@ class CacheListenerSupport {
     }
 
     def propertyMissing(String name) {
+        if ('cache'.equals(name)) {
+            return CacheFactory.getAnyInstance()
+        }
+
+        Region region = CacheFactory.getAnyInstance().getRegion(name)
+        if (region != null) {
+            return region
+        }
+
         println "CacheListenerSupport.propertyMissing.$name"
     }
 

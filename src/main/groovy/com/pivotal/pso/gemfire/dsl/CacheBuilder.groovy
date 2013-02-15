@@ -5,6 +5,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 
 import com.gemstone.gemfire.cache.Cache
+import com.gemstone.gemfire.cache.RegionAttributes
 import com.gemstone.gemfire.cache.RegionFactory
 import com.gemstone.gemfire.cache.RegionShortcut
 
@@ -36,6 +37,10 @@ class CacheBuilder {
             def shortcut = (RegionShortcut) params['shortcut']
             factory = cache.createRegionFactory(shortcut)
         }
+        else if (params['attributes'] && (params['attributes'] instanceof RegionAttributes)) {
+            def attributes = (RegionShortcut) params['attributes']
+            factory = cache.createRegionFactory(attributes)
+        }
         else {
             factory = cache.createRegionFactory()
         }
@@ -46,6 +51,30 @@ class CacheBuilder {
         hydrated()
 
         factory.create(name)
+    }
+
+    def asyncEventQueue() {
+        cache.createAsyncEventQueueFactory()
+    }
+
+    def diskStore() {
+        cache.createDiskStoreFactory()
+    }
+
+    def gatewayReceiver() {
+        cache.createGatewayReceiverFactory()
+    }
+
+    def gatewaySender() {
+        cache.createGatewaySenderFactory()
+    }
+
+    def pdxInstance() {
+        cache.createPdxEnum("", "", 0)
+    }
+
+    def pdxInstanceFactory() {
+        cache.createPdxInstanceFactory("")
     }
 
 }

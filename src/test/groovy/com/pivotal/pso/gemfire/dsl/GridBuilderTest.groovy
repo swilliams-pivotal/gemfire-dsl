@@ -17,7 +17,7 @@ class GridBuilderTest {
     public void test() throws Exception {
         def listener3 = [
             afterCreate: { e->
-                // println "3.afterCreate: ${e}" // DOES fire.
+                println "3.afterCreate: ${e}" // DOES fire.
                 send(e)
             },
             afterDestroy: { e->
@@ -31,9 +31,10 @@ class GridBuilderTest {
             }
         ]
 
+// FIXME this listener doesn't work correctly, the dispatcher doesn't like it
 //        def listener4 = {
-//            afterCreate: {
-//                println "4.afterCreate: ${it}" // Does NOT fire, why?
+//            afterCreate: { e->
+//                println "4.afterCreate: $(e}" // Does NOT fire, why?
 //                // send(e)
 //            }
 //            afterDestroy: {
@@ -63,8 +64,8 @@ class GridBuilderTest {
             }
         }
 
-        def gridBuilder = new GridBuilder()
-        def cache = gridBuilder.gemfire {
+        def builder = new GridBuilder()
+        def cache = builder.gemfire {
             properties (
                 'jmx-manager': 'true',
                 'jmx-manager-start': 'false',
@@ -82,7 +83,8 @@ class GridBuilderTest {
                 server 'server1', {
                     bindAddress '127.0.0.1'
                 }
-                region 'region1', type: REPLICATE, {
+
+                region 'region1', shortcut: REPLICATE, bob:'foo', {
                     listener (
                         afterCreate: { EntryEvent e->
                             // println "1.afterCreate: ${e}"  // DOES fire.
@@ -99,19 +101,20 @@ class GridBuilderTest {
                         }
                     )
                 }
-                region 'region2', type: REPLICATE, {
+                region 'region2', shortcut: REPLICATE, {
                     writer {
                         beforeCreate { e->
                             println "2.beforeCreate: ${e}"  // DOES fire.
-                            // drop()
+                            if (e.key == 'two-2') drop() // delegated utility to throw a CacheWriterException
                         }
                     }
                     listener {
                         afterCreate { e->
-                            // println "2.afterCreate: ${e}"  // DOES fire.
-                            send(e)
+                            // println "2.afterCreate: ${e}"
+                            cache.getRegion('region3').put('two-b', 'two-b')  // cache is not declared, it's discovered at runtime using propertyMissing(name)
+                            region3.put('two-c', 'two-c')  // region3 is not declared, it's discovered at runtime using propertyMissing(name)
                         }
-                        afterDestroy: { e->
+                        afterDestroy { e->
                             println "2.afterDestroy: ${e}"
                         }
                         afterRegionCreate { e->
@@ -122,21 +125,27 @@ class GridBuilderTest {
                         }
                     }
                 }
-                region 'region3', type: REPLICATE, {
+                region 'region3', shortcut: REPLICATE, {
                     listener listener3
                 }
-                region 'region4', type: REPLICATE, {
-                    // listener listener4
+                region 'region4', shortcut: REPLICATE, {
+                    // listener listener4 // FIXME this listener doesn't work correctly, the dispatcher doesn't like it
                 }
-                region 'region5', type: REPLICATE, {
+                region 'region5', shortcut: REPLICATE, {
                     listener listener5
                 }
-                region 'all', type: REPLICATE, {
+                region 'all', shortcut: PARTITION, {
                     writer {
                         beforeCreate: { e-> println "all.loader.put.beforeCreate($e)" }
                     }
                     listener {
                         afterCreate: { e-> println "all.listener.put.afterCreate($e)" }
+                    }
+                    partitionAttributes {
+                        resolver 'foo', { e->
+                            println "all.route:${e}"
+                            e.getKey() // return routing object
+                        }
                     }
                 }
             }
@@ -144,6 +153,7 @@ class GridBuilderTest {
 
         cache.getRegion('region1').put('one', 'one', 'one')
         cache.getRegion('region2').put('two', 'two', 'two')
+        cache.getRegion('region2').put('two-2', 'two-2', 'two-2')
         cache.getRegion('region3').put('three', 'three', 'three')
         cache.getRegion('region4').put('four', 'four', 'four')
         cache.getRegion('region5').put('five', 'five', 'five')

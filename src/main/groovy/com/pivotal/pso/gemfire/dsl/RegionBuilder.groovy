@@ -5,34 +5,22 @@ import groovy.transform.TypeChecked
 
 import com.gemstone.gemfire.cache.CacheLoader
 import com.gemstone.gemfire.cache.CacheWriter
-import com.gemstone.gemfire.cache.EntryEvent
-import com.gemstone.gemfire.cache.RegionEvent
+import com.gemstone.gemfire.cache.CustomExpiry
+import com.gemstone.gemfire.cache.DataPolicy
+import com.gemstone.gemfire.cache.EvictionAttributes
+import com.gemstone.gemfire.cache.ExpirationAttributes
+import com.gemstone.gemfire.cache.MembershipAttributes
+import com.gemstone.gemfire.cache.PartitionAttributesFactory
 import com.gemstone.gemfire.cache.RegionFactory
+import com.gemstone.gemfire.cache.Scope
+import com.gemstone.gemfire.cache.SubscriptionAttributes
 import com.gemstone.gemfire.cache.util.CacheListenerAdapter
 import com.gemstone.gemfire.cache.util.CacheWriterAdapter
 
 
 @CompileStatic
-// @TypeChecked
+@TypeChecked
 class RegionBuilder {
-
-    static final Closure EEC = { EntryEvent e-> println "eec: $e" }
-
-    static final Closure REC = { RegionEvent e-> println "rec: $e" }
-
-    static final Map<String, Closure> CACHE_LISTENER_MAP = [
-            afterCreate: EEC,
-            afterUpdate: EEC,
-            afterInvalidate: EEC,
-            afterDestroy: EEC,
-            afterRegionInvalidate: REC,
-            afterRegionDestroy: REC,
-            afterRegionClear: REC,
-            afterRegionCreate: REC,
-            afterRegionLive: REC,
-            close: {}
-        ]
-
 
     private final String name
 
@@ -46,9 +34,15 @@ class RegionBuilder {
         this.params = params
     }
 
-    def loader(@DelegatesTo(strategy=Closure.OWNER_FIRST, value=GenericListenerBuilder) Closure closure) {
+    def asyncEventQueueIds(List ids) {
+        ids.each { String id->
+            regionFactory.addAsyncEventQueueId(id)
+        }
+    }
 
-        def builder = new GenericListenerBuilder()
+    def loader(@DelegatesTo(strategy=Closure.OWNER_FIRST, value=CacheListenerBuilder) Closure closure) {
+
+        def builder = new CacheListenerBuilder()
         def hydrated = closure.rehydrate(builder, this, this)
         hydrated.resolveStrategy = Closure.DELEGATE_FIRST
         def loader = hydrated()
@@ -62,25 +56,20 @@ class RegionBuilder {
         regionFactory.setCacheLoader(all as CacheLoader)
     }
 
-    def writer(@DelegatesTo(strategy=Closure.OWNER_FIRST, value=GenericListenerBuilder) Closure closure) {
+    def partitionAttributes(@DelegatesTo(strategy=Closure.OWNER_FIRST, value=PartitionAttributesBuilder) Closure closure) {
+        PartitionAttributesFactory factory = new PartitionAttributesFactory()
 
-        def builder = new GenericListenerBuilder()
+        def builder = new PartitionAttributesBuilder(factory)
         def hydrated = closure.rehydrate(builder, this, this)
         hydrated.resolveStrategy = Closure.DELEGATE_FIRST
-        def writer = hydrated()
-        regionFactory.setCacheWriter(writer as CacheWriterAdapter)
+        hydrated()
+
+        regionFactory.setPartitionAttributes(factory.create())
     }
 
-    def writer(Map writer) {
-        // println "RegionBuilder.writerFromMap(map: ${writer.dump()})"
-        Map<String, Closure> all = [:].withDefault {-> { -> } }
-        all.putAll(writer)
-        regionFactory.setCacheWriter(all as CacheWriter)
-    }
+    def listener(@DelegatesTo(strategy=Closure.OWNER_FIRST, value=CacheListenerBuilder) Closure closure) {
 
-    def listener(@DelegatesTo(strategy=Closure.OWNER_FIRST, value=GenericListenerBuilder) Closure closure) {
-
-        def builder = new GenericListenerBuilder()
+        def builder = new CacheListenerBuilder()
         def hydrated = closure.rehydrate(builder, this, this)
         hydrated.resolveStrategy = Closure.DELEGATE_FIRST
         def listener = hydrated()
@@ -88,20 +77,101 @@ class RegionBuilder {
         regionFactory.addCacheListener(listener as CacheListenerAdapter)
     }
 
-    def listener(Map listener) {
-        Map<String, Closure> all = [:]
+    def listener(Map funcmap) {
+        Map<String, Closure> listener = [:]
 
-        listener.collectEntries(all) { String name, Closure closure ->
-
+        // create a new map, add & transform closures in it
+        funcmap.collectEntries(listener) { String name, Closure closure ->
             def owner = closure.owner
             def thisObject = closure.thisObject
-            def rls = new CacheListenerSupport()
-            def hydrated = closure.rehydrate(rls, owner, thisObject)
+            def cls = new CacheListenerSupport()
+            def hydrated = closure.rehydrate(cls, owner, thisObject)
             hydrated.resolveStrategy = Closure.DELEGATE_FIRST
             [name, hydrated]
         }
 
         regionFactory.addCacheListener(listener as CacheListenerAdapter)
+    }
+
+    def writer(@DelegatesTo(strategy=Closure.OWNER_FIRST, value=CacheListenerBuilder) Closure closure) {
+
+        def builder = new CacheWriterSupport()
+        def hydrated = closure.rehydrate(builder, this, this)
+        hydrated.resolveStrategy = Closure.DELEGATE_FIRST
+        def writer = hydrated()
+
+        regionFactory.setCacheWriter(writer as CacheWriterAdapter)
+    }
+
+    def writer(Map funcmap) {
+        Map<String, Closure> writer = [:]
+
+        // create a new map, add & transform closures in it
+        funcmap.collectEntries(writer) { String name, Closure closure ->
+            def owner = closure.owner
+            def thisObject = closure.thisObject
+            def cls = new CacheWriterSupport()
+            def hydrated = closure.rehydrate(cls, owner, thisObject)
+            hydrated.resolveStrategy = Closure.DELEGATE_FIRST
+            [name, hydrated]
+        }
+
+        regionFactory.setCacheWriter(writer as CacheWriter)
+    }
+
+    def customEntryIdleTimeout() {
+        CustomExpiry customExpiry = null
+        regionFactory.setCustomEntryIdleTimeout(customExpiry)
+    }
+
+    def customEntryTimeToLive() {
+        CustomExpiry customExpiry = null
+        regionFactory.setCustomEntryTimeToLive(customExpiry)
+    }
+
+    def dataPolicy() {
+        DataPolicy dataPolicy = null
+        regionFactory.setDataPolicy(dataPolicy)
+    }
+
+    def entryIdleTimeout() {
+        ExpirationAttributes expirationAttributes = null
+        regionFactory.setEntryIdleTimeout(expirationAttributes)
+    }
+
+    def entryTimeToLive() {
+        ExpirationAttributes expirationAttributes = null
+        regionFactory.setEntryTimeToLive(expirationAttributes)
+    }
+
+    def evictionAttributes() {
+        EvictionAttributes evictionAttributes = null
+        regionFactory.setEvictionAttributes(evictionAttributes)
+    }
+
+    def membershipAttributes() {
+        MembershipAttributes membershipAttributes = null
+        regionFactory.setMembershipAttributes(membershipAttributes)
+    }
+
+    def regionIdleTimeout() {
+        ExpirationAttributes expirationAttributes = null
+        regionFactory.setRegionIdleTimeout(expirationAttributes)
+    }
+
+    def regionTimeToLive() {
+        ExpirationAttributes expirationAttributes = null
+        regionFactory.setRegionTimeToLive(expirationAttributes)
+    }
+
+    def scope() {
+        Scope scopeType = null
+        regionFactory.setScope(scopeType)
+    }
+
+    def subscriptionAttributes() {
+        SubscriptionAttributes subscriptionAttributes = null
+        regionFactory.setSubscriptionAttributes(subscriptionAttributes)
     }
 
     def methodMissing(String name, args) {
