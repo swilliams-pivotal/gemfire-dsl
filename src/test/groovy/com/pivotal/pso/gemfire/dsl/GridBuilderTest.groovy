@@ -9,16 +9,27 @@ import java.util.concurrent.TimeUnit
 import org.junit.Test
 
 import com.gemstone.gemfire.cache.EntryEvent
+import com.gemstone.gemfire.cache.execute.Execution
+import com.gemstone.gemfire.cache.execute.FunctionService
+import com.gemstone.gemfire.cache.execute.ResultCollector
 
 
+// @CompileStatic
 class GridBuilderTest {
 
     @Test
     public void test() throws Exception {
+
+        def function2 = { fc->
+            println "fc2: ${fc}"
+            last('bar')
+            // fc.getResultSender().lastResult 'foo2'
+        }
+
         def listener3 = [
             afterCreate: { e->
                 println "3.afterCreate: ${e}" // DOES fire.
-                send(e)
+                // send(e)
             },
             afterDestroy: { e->
                 println "3.afterDestroy: ${e}"
@@ -51,7 +62,7 @@ class GridBuilderTest {
         def listener5 = {
             afterCreate { e->
                 // println "5.afterCreate: ${e}" // Does NOT fire, why?
-                send(e)
+                // send(e)
             }
             afterDestroy { e->
                 println "5.afterDestroy: ${e}"
@@ -80,6 +91,11 @@ class GridBuilderTest {
                 serializer 'dummy.DummyPdxSerializer'
             }
             cache {
+                function 'func1', { fc->
+                    println "fc1: ${fc}"
+                    last 'foo'
+                }
+                function 'func2', function2
                 server 'server1', {
                     bindAddress '127.0.0.1'
                 }
@@ -106,13 +122,19 @@ class GridBuilderTest {
                         beforeCreate { e->
                             println "2.beforeCreate: ${e}"  // DOES fire.
                             if (e.key == 'two-2') drop() // delegated utility to throw a CacheWriterException
+//                            
+//                            region3['one'] = 'one'
+//                            msg (args) to 'region@foo'
                         }
                     }
                     listener {
                         afterCreate { e->
                             // println "2.afterCreate: ${e}"
                             cache.getRegion('region3').put('two-b', 'two-b')  // cache is not declared, it's discovered at runtime using propertyMissing(name)
-                            region3.put('two-c', 'two-c')  // region3 is not declared, it's discovered at runtime using propertyMissing(name)
+//                            '@region3'.put('two-c', 'two-c')  // region3 is not declared, it's discovered at runtime using propertyMissing(name)
+//                            msg 'two-c', 'two-c' >> region3
+//                            foo arg | sff
+                            region3['two-c'] = 'two-c'
                         }
                         afterDestroy { e->
                             println "2.afterDestroy: ${e}"
@@ -139,7 +161,7 @@ class GridBuilderTest {
                         beforeCreate: { e-> println "all.loader.put.beforeCreate($e)" }
                     }
                     listener {
-                        afterCreate: { e-> println "all.listener.put.afterCreate($e)" }
+                        afterCreate { e-> println "all.listener.put.afterCreate($e)" }
                     }
                     partitionAttributes {
                         resolver 'foo', { e->
@@ -160,8 +182,17 @@ class GridBuilderTest {
 
         cache.getRegion('all').put('all', 'all', 'all')
 
-//        cache.getRegion('all').getAttributesMutator().addCacheListener {}
-//        regions.all.listeners << {}
+        // ClosureService.region3.listeners << { { foo -> } | { bar-> } }
+        // Closure foo = { }
+
+        Execution execution = FunctionService.onRegion(cache.getRegion('all'))
+            .withArgs(Boolean.TRUE)
+
+        ResultCollector rc1 = execution.execute('func1')
+        List result1 = (List) rc1.getResult()
+
+        ResultCollector rc2 = execution.execute('func2')
+        List result2 = (List) rc2.getResult()
 
         TimeUnit.SECONDS.sleep(10)
     }

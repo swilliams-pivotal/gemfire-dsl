@@ -93,7 +93,7 @@ class RegionBuilder {
         regionFactory.addCacheListener(listener as CacheListenerAdapter)
     }
 
-    def writer(@DelegatesTo(strategy=Closure.OWNER_FIRST, value=CacheListenerBuilder) Closure closure) {
+    def writer(@DelegatesTo(strategy=Closure.DELEGATE_FIRST, value=CacheListenerBuilder) Closure closure) {
 
         def builder = new CacheWriterSupport()
         def hydrated = closure.rehydrate(builder, this, this)
