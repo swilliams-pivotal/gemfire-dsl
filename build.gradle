@@ -5,6 +5,7 @@ apply plugin: 'groovy'
 apply from: 'gradle/infra.gradle'
 
 repositories {
+  mavenLocal()
   mavenRepo name: 'Gemstone', url: 'http://dist.gemstone.com/maven/release'
   mavenCentral()
 }
@@ -13,6 +14,8 @@ dependencies {
   compile "org.codehaus.groovy:groovy-all:$groovyVersion"
   compile "org.codehaus.gpars:gpars:$gparsVersion"
   compile "com.gemstone.gemfire:gemfire:$gemfireVersion"
+  compile "com.pivotal.pso:gemfire-groovy-extensions:0.1-SNAPSHOT"
+
   testCompile "junit:junit-dep:$junitVersion"
 }
 
