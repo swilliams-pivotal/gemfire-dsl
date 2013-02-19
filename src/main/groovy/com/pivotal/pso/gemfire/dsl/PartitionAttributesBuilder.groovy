@@ -5,6 +5,7 @@ import groovy.transform.CompileStatic
 import com.gemstone.gemfire.cache.PartitionAttributesFactory
 import com.gemstone.gemfire.cache.PartitionResolver
 import com.gemstone.gemfire.cache.partition.PartitionListener
+import com.pivotal.pso.gemfire.util.CacheListenerSupport
 
 
 @CompileStatic

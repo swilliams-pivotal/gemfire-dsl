@@ -16,6 +16,8 @@ import com.gemstone.gemfire.cache.Scope
 import com.gemstone.gemfire.cache.SubscriptionAttributes
 import com.gemstone.gemfire.cache.util.CacheListenerAdapter
 import com.gemstone.gemfire.cache.util.CacheWriterAdapter
+import com.pivotal.pso.gemfire.util.CacheListenerSupport
+import com.pivotal.pso.gemfire.util.CacheWriterSupport
 
 
 @CompileStatic

@@ -2,6 +2,8 @@ package com.pivotal.pso.gemfire.dsl
 
 import groovy.transform.CompileStatic
 
+import com.pivotal.pso.gemfire.util.CacheListenerSupport
+
 
 @CompileStatic
 class CacheListenerBuilder {

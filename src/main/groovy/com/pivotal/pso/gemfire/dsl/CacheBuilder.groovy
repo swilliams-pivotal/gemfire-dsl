@@ -2,7 +2,6 @@ package com.pivotal.pso.gemfire.dsl
 
 import static groovy.lang.Closure.DELEGATE_FIRST
 import static groovy.lang.Closure.OWNER_FIRST
-import groovy.transform.CompileStatic
 
 import com.gemstone.gemfire.cache.Cache
 import com.gemstone.gemfire.cache.RegionAttributes
@@ -11,7 +10,7 @@ import com.gemstone.gemfire.cache.RegionShortcut
 import com.gemstone.gemfire.cache.execute.FunctionService
 
 
-@CompileStatic
+// @CompileStatic
 class CacheBuilder {
 
     private Cache cache
