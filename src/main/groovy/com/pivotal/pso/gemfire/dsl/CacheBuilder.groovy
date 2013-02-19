@@ -2,19 +2,15 @@ package com.pivotal.pso.gemfire.dsl
 
 import static groovy.lang.Closure.DELEGATE_FIRST
 import static groovy.lang.Closure.OWNER_FIRST
-import groovy.transform.CompileStatic
-import groovy.transform.TypeChecked
 
 import com.gemstone.gemfire.cache.Cache
-import com.gemstone.gemfire.cache.Region
 import com.gemstone.gemfire.cache.RegionAttributes
 import com.gemstone.gemfire.cache.RegionFactory
 import com.gemstone.gemfire.cache.RegionShortcut
-import com.gemstone.gemfire.cache.execute.FunctionAdapter
 import com.gemstone.gemfire.cache.execute.FunctionService
 
 
-@CompileStatic
+// @CompileStatic
 class CacheBuilder {
 
     private Cache cache
@@ -27,18 +23,10 @@ class CacheBuilder {
         function([:], name, closure)
     }
 
-    def function(Map<String, Closure> params, String id, @DelegatesTo(strategy=OWNER_FIRST, value=ClosureFunctionAdapter) Closure closure) {
+    def function(Map<String, Closure> params, String id, Closure closure) {
         println "function.$id(${params})"
-
-        Region<String, byte[]> cclr = cache.getRegion('closure.classloader')
-        cclr.put(closure.class.getName(), new byte[0])
-
-        FunctionAdapter adapter = new ClosureFunctionAdapter(id, closure)
-//        if (params.ha) func['isHA'] = { params.ha }
-//        if (params.result) func['hasResult'] = { params.result }
-//        if (params.optimizeForWrite) func['optimizeForWrite'] = { params.optimizeForWrite }
-
-        FunctionService.registerFunction(adapter)
+        
+        FunctionService.registerFunction(id, closure)
     }
 
 

@@ -13,11 +13,24 @@ class ClosureFunctionAdapter extends FunctionAdapter {
 
     private final String id
 
+    private final boolean ha
+
+    private final boolean result
+
+    private final boolean optimizeForWrite
+
     private final Closure<Object> closure
 
-    public ClosureFunctionAdapter(java.lang.String id, @DelegatesTo(strategy=DELEGATE_FIRST, value=FunctionContextSupport) groovy.lang.Closure closure) {
+    public ClosureFunctionAdapter(java.lang.String id, boolean ha, boolean result, boolean optimizeForWrite, @DelegatesTo(strategy=DELEGATE_FIRST, value=FunctionContextSupport) groovy.lang.Closure closure) {
         this.id = id
+        this.ha = ha
+        this.result = result
+        this.optimizeForWrite = optimizeForWrite
         this.closure = closure
+    }
+
+    public ClosureFunctionAdapter(java.lang.String id, @DelegatesTo(strategy=DELEGATE_FIRST, value=FunctionContextSupport) groovy.lang.Closure closure) {
+        this(id, true, true, false, closure)
     }
 
     @Override
@@ -37,6 +50,21 @@ class ClosureFunctionAdapter extends FunctionAdapter {
     @Override
     public String getId() {
         return id;
+    }
+
+    @Override
+    public boolean hasResult() {
+        return result
+    }
+
+    @Override
+    public boolean isHA() {
+        return ha
+    }
+
+    @Override
+    public boolean optimizeForWrite() {
+        return optimizeForWrite
     }
 
 }

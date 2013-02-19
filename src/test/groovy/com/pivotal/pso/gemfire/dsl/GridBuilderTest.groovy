@@ -173,6 +173,15 @@ class GridBuilderTest {
             }
         }
 
+        // Uses Groovy extensions module to add a method that takes a Map<String,Closure>
+        // via the AttributesMutator
+        def region4 = cache.getRegion('region4')
+        region4.addCacheListener (
+            afterCreate: { e->
+                println "4.mutated.afterCreate ${e}"
+            }
+        )
+
         cache.getRegion('region1').put('one', 'one', 'one')
         cache.getRegion('region2').put('two', 'two', 'two')
         cache.getRegion('region2').put('two-2', 'two-2', 'two-2')
@@ -180,19 +189,21 @@ class GridBuilderTest {
         cache.getRegion('region4').put('four', 'four', 'four')
         cache.getRegion('region5').put('five', 'five', 'five')
 
-        cache.getRegion('all').put('all', 'all', 'all')
-
-        // ClosureService.region3.listeners << { { foo -> } | { bar-> } }
-        // Closure foo = { }
+        def range = 0..10
+        for (i in range) {
+            cache.getRegion('all').put("all-$i", "all-$i")
+        }
 
         Execution execution = FunctionService.onRegion(cache.getRegion('all'))
             .withArgs(Boolean.TRUE)
 
         ResultCollector rc1 = execution.execute('func1')
-        List result1 = (List) rc1.getResult()
+        List result1 = rc1.getResult()
+        println "result: ${result1}"
 
         ResultCollector rc2 = execution.execute('func2')
-        List result2 = (List) rc2.getResult()
+        List result2 = rc2.getResult()
+        println "result: ${result2}"
 
         TimeUnit.SECONDS.sleep(10)
     }
