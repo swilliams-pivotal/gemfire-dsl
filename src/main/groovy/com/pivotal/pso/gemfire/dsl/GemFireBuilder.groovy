@@ -33,7 +33,7 @@ class GemFireBuilder {
         cache.createRegionFactory(RegionShortcut.REPLICATE)
             .setKeyConstraint(String.class)
             .setValueConstraint(byte[].class)
-            // .addCacheListener(listener)
+            .addCacheListener(new ClosureClassLoaderCacheListener())
             .create('closure.classloader')
 
         def builder = new CacheBuilder(cache)
@@ -44,11 +44,4 @@ class GemFireBuilder {
         cache
     }
 
-//    def call() {
-//        println "GemFireBuilder.call()"
-//    }
-//
-//    def build() {
-//        println "GemFireBuilder.build()"
-//    }
 }

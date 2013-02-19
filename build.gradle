@@ -1,6 +1,7 @@
 // This is a single project
 
-apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'groovy'
 apply from: 'gradle/infra.gradle'
 
@@ -9,6 +10,8 @@ repositories {
   maven { url 'http://dist.gemstone.com/maven/release' }
   mavenCentral()
 }
+
+defaultTasks = ['cleanCheck']
 
 dependencies {
   compile "org.codehaus.groovy:groovy-all:$groovyVersion"
@@ -19,7 +22,11 @@ dependencies {
   testCompile "junit:junit-dep:$junitVersion"
 }
 
+compileGroovy.groovyOptions.useAnt = true
+compileTestGroovy.groovyOptions.useAnt = true
+
 test {
+    testLogging { exceptionFormat "full" }
     testLogging.showStandardStreams = true
 }
 

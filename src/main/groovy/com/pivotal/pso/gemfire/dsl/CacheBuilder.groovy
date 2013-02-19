@@ -10,7 +10,7 @@ import com.gemstone.gemfire.cache.RegionShortcut
 import com.gemstone.gemfire.cache.execute.FunctionService
 
 
-// @CompileStatic
+// @CompileStatic Gradle doesn't like this with Groovy Extensions
 class CacheBuilder {
 
     private Cache cache
@@ -23,7 +23,7 @@ class CacheBuilder {
         function([:], name, closure)
     }
 
-    def function(Map<String, Closure> params, String id, Closure closure) {
+    def function(Map<String, Closure> params, java.lang.String id, groovy.lang.Closure closure) {
         println "function.$id(${params})"
 
         FunctionService.registerFunction(id, closure)
