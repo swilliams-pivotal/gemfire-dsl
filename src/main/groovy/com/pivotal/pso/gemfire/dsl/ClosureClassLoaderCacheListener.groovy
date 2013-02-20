@@ -22,8 +22,8 @@ class ClosureClassLoaderCacheListener extends CacheListenerAdapter {
         }
 
         ClassLoader loader = ClosureClassLoaderCacheListener.class.getClassLoader()
-        Class<?> c = loader.defineClass(name, data, 0, data.length);
-        loader.resolveClass(c);
+        Class<?> c = loader.defineClass(name, data, 0, data.length)
+        loader.resolveClass(c)
     }
 
 }
