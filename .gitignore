@@ -1,12 +1,17 @@
 .classpath
+.DS_Store
 .gradle
 .groovy
+.idea
 .project
 .settings
+*.class
+*.iml
 BACKUPDEFAULT.if
 bin
 build
 license
+out
 gemfire.properties
 vf.gf.dmn-events.txt
 vf.gf.dmn-license.cfg
