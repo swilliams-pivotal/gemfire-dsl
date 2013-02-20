@@ -4,6 +4,7 @@ import com.gemstone.gemfire.cache.CacheWriterException
 import com.gemstone.gemfire.cache.EntryEvent
 import com.gemstone.gemfire.cache.util.CacheWriterAdapter
 
+
 class ClosureClassLoaderCacheWriter extends CacheWriterAdapter {
 
     @Override
@@ -16,12 +17,9 @@ class ClosureClassLoaderCacheWriter extends CacheWriterAdapter {
         catch (Throwable t) {
             throw new CacheWriterException(t)
         }
-        catch (Error e) {
-            throw new CacheWriterException(e)
-        }
     }
 
-    protected void fireCacheEvent(EntryEvent<String, byte[]> event) throws Exception, Error {
+    protected void fireCacheEvent(EntryEvent<String, byte[]> event) throws Exception {
 
         String name = event.getKey()
         byte[] data = event.getNewValue()

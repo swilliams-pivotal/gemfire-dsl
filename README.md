@@ -1,4 +1,5 @@
 gemfire-dsl
 ===========
 
-A Groovy DSL for GemFire
+# A Groovy DSL for GemFire
+
