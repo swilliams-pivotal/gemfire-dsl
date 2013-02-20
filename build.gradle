@@ -1,22 +1,61 @@
-// This is a single project
+apply from: 'gradle/setup.gradle'
 
-apply plugin: 'java'
-apply plugin: 'groovy'
-apply from: 'gradle/infra.gradle'
+description = 'Groovy DSL for GEMFIRE data grid technology'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 
 repositories {
-  mavenRepo name: 'Gemstone', url: 'http://dist.gemstone.com/maven/release'
-  mavenCentral()
+    mavenLocal()
+    mavenCentral()
+    mavenRepo url: 'https://repo.springsource.org/libs-release'
+    mavenRepo name: 'Gemstone', url: 'http://dist.gemstone.com/maven/release'
 }
 
 dependencies {
-  compile "org.codehaus.groovy:groovy-all:$groovyVersion"
-  compile "com.gemstone.gemfire:gemfire:$gemfireVersion"
-  testCompile "junit:junit-dep:$junitVersion"
+    /**
+     * core libraries
+     */
+    compile "org.codehaus.groovy:groovy-all:$groovyVersion"
+    compile "com.gemstone.gemfire:gemfire:$gemfireVersion"
+
+    /**
+     * test libraries
+     */
+    testCompile "org.spockframework:spock-core:$spockVersion"
+
+    /**
+     * log libraries
+     */
+    compile "ch.qos.logback:logback-classic:$logbackVersion"
+    runtime "org.slf4j:jcl-over-slf4j:$slf4jVersion"
+    //runtime "org.slf4j:jul-to-slf4j:$slf4jVersion"
+    compile "org.slf4j:slf4j-api:$slf4jVersion"
+
+    /**
+     * Actor/Reactive libraries
+     */
+    //compile "com.netflix.rxjava:rxjava-groovy:$rxJavaVersion"
+    //compile "org.codehaus.gpars:gpars:$gparsVersion"
 }
 
-test {
-    testLogging.showStandardStreams = true
-}
-
-task cleanCheck(dependsOn: ['check','clean'])
+/**
+ * Groovy compiler modifications to update Indy / CompileStatic
+ */
+/* compileGroovy {
+         options.useAnt = true
+         groovyOptions.useAnt = true
+         groovyOptions.metaClass.optionMap = {
+             [
+                     memoryMaximumSize: '384m',
+                     fork: true,
+                     includeJavaRuntime: false,
+                     verbose: false,
+                     encoding: 'UTF-8',
+                     failonerror: true,
+                     stacktrace: false,
+                     listfiles: false
+             ]
+         }
+     }
+ */

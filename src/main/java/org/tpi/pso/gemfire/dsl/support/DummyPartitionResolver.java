@@ -3,6 +3,7 @@ package org.tpi.pso.gemfire.dsl.support;
 import com.gemstone.gemfire.cache.EntryOperation;
 import com.gemstone.gemfire.cache.PartitionResolver;
 
+@Deprecated
 public class DummyPartitionResolver<K, V> implements PartitionResolver<K, V> {
 
     @Override

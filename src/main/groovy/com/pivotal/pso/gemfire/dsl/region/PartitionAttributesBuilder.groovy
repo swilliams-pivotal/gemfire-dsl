@@ -1,5 +1,6 @@
-package com.pivotal.pso.gemfire.dsl
+package com.pivotal.pso.gemfire.dsl.region
 
+import com.pivotal.pso.gemfire.dsl.listeners.CacheListenerSupport
 import groovy.transform.CompileStatic
 
 import com.gemstone.gemfire.cache.PartitionAttributesFactory
@@ -60,9 +61,9 @@ class PartitionAttributesBuilder {
 
         def owner = routing.owner
         def thisObject = routing.thisObject
-        def cls = new CacheListenerBuilder()
+        //def cls = new CacheListenerBuilder()
 
-        def hydrated = routing.rehydrate(cls, owner, thisObject)
+        def hydrated = routing.rehydrate(this, owner, thisObject)
         hydrated.resolveStrategy = Closure.DELEGATE_FIRST
 
         def resolver = [:]

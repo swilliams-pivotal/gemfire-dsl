@@ -4,6 +4,7 @@ import com.gemstone.gemfire.cache.CacheLoader;
 import com.gemstone.gemfire.cache.CacheLoaderException;
 import com.gemstone.gemfire.cache.LoaderHelper;
 
+@Deprecated
 public class DefaultCacheLoader<K, V> implements CacheLoader<K, V> {
 
     @Override

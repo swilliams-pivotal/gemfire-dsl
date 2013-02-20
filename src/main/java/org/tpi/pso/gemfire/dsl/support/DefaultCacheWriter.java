@@ -5,6 +5,7 @@ import com.gemstone.gemfire.cache.EntryEvent;
 import com.gemstone.gemfire.cache.RegionEvent;
 import com.gemstone.gemfire.cache.util.CacheWriterAdapter;
 
+@Deprecated
 public class DefaultCacheWriter<K, V> extends CacheWriterAdapter<K, V> {
 
     @Override

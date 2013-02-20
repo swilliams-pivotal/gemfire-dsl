@@ -1,4 +1,4 @@
-package com.pivotal.pso.gemfire.dsl
+package com.pivotal.pso.gemfire.dsl.listeners
 
 import groovy.transform.CompileStatic
 

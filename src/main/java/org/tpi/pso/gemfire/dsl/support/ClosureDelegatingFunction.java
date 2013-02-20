@@ -15,6 +15,7 @@ import com.gemstone.gemfire.cache.execute.Function;
 import com.gemstone.gemfire.cache.execute.FunctionContext;
 import com.gemstone.gemfire.cache.execute.FunctionService;
 
+@Deprecated
 public class ClosureDelegatingFunction implements Function {
 
     public static void main(String[] arguments) {
