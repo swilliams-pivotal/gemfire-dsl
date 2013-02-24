@@ -3,4 +3,4 @@ gemfire-dsl
 
 # A Groovy DSL for GemFire
 
-** doc coming **
+[![Build Status](https://travis-ci.org/smaldini/gemfire-dsl.png?branch=master)](https://travis-ci.org/smaldini/gemfire-dsl)
