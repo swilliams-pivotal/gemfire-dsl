@@ -2,6 +2,7 @@ package org.tpi.pso.gemfire.dsl.loader;
 
 import com.gemstone.gemfire.cache.Region;
 
+@Deprecated
 public class DistributedClassLoader extends ClassLoader {
 
     private final Region<String, byte[]> region;

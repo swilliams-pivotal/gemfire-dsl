@@ -1,4 +1,4 @@
-package com.pivotal.pso.gemfire.dsl
+package com.pivotal.pso.gemfire.dsl.listeners
 
 import com.gemstone.gemfire.cache.CacheWriterException
 import com.gemstone.gemfire.cache.EntryEvent

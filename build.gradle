@@ -1,26 +1,51 @@
-// This is a single project
+apply from: 'gradle/setup.gradle'
 
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'groovy'
-apply from: 'gradle/infra.gradle'
+description = 'Groovy DSL for GEMFIRE data grid technology'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 
 repositories {
-  mavenLocal()
-  maven { url 'http://dist.gemstone.com/maven/release' }
-  mavenCentral()
+    mavenLocal()
+    mavenCentral()
+    mavenRepo url: 'https://repo.springsource.org/libs-release'
+    mavenRepo name: 'Gemstone', url: 'http://dist.gemstone.com/maven/release'
 }
 
 defaultTasks = ['cleanCheck']
 
 dependencies {
-  compile "org.codehaus.groovy:groovy-all:$groovyVersion"
-  compile "org.codehaus.gpars:gpars:$gparsVersion"
-  compile "com.gemstone.gemfire:gemfire:$gemfireVersion"
-  compile "com.pivotal.pso:gemfire-groovy-extensions:0.1-SNAPSHOT"
+    /**
+     * core libraries
+     */
+    compile "org.codehaus.groovy:groovy-all:$groovyVersion"
+    compile "com.gemstone.gemfire:gemfire:$gemfireVersion"
+    compile "com.pivotal.pso:gemfire-groovy-extensions:0.1-SNAPSHOT"
 
-  testCompile "junit:junit-dep:$junitVersion"
+
+    /**
+     * test libraries
+     */
+    testCompile "org.spockframework:spock-core:$spockVersion"
+
+    /**
+     * log libraries
+     */
+    compile "ch.qos.logback:logback-classic:$logbackVersion"
+    runtime "org.slf4j:jcl-over-slf4j:$slf4jVersion"
+    //runtime "org.slf4j:jul-to-slf4j:$slf4jVersion"
+    compile "org.slf4j:slf4j-api:$slf4jVersion"
+
+    /**
+     * Actor/Reactive libraries
+     */
+    //compile "com.netflix.rxjava:rxjava-groovy:$rxJavaVersion"
+    compile "org.codehaus.gpars:gpars:$gparsVersion"
 }
+
+/**
+ * Groovy compiler modifications to update Indy / CompileStatic
+ */
 
 compileGroovy.groovyOptions.useAnt = true
 compileTestGroovy.groovyOptions.useAnt = true
@@ -30,4 +55,20 @@ test {
     testLogging.showStandardStreams = true
 }
 
-task cleanCheck(dependsOn: ['check','clean'])
+/* compileGroovy {
+         options.useAnt = true
+         groovyOptions.useAnt = true
+         groovyOptions.metaClass.optionMap = {
+             [
+                     memoryMaximumSize: '384m',
+                     fork: true,
+                     includeJavaRuntime: false,
+                     verbose: false,
+                     encoding: 'UTF-8',
+                     failonerror: true,
+                     stacktrace: false,
+                     listfiles: false
+             ]
+         }
+     }
+ */
